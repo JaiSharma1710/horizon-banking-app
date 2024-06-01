@@ -1,25 +1,27 @@
 import React from "react";
 import { FormControl, FormField, FormLabel, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
-import { Control } from "react-hook-form";
-import { formSchema } from "./AuthForm";
+import { Control, FieldPath } from "react-hook-form";
+import { authFormSchema } from "@/lib/utils";
 import { z } from "zod";
 
-interface CustomFormProps {
+const formSchema = authFormSchema("signIn");
+
+interface CustomInputProps {
   control: Control<z.infer<typeof formSchema>>;
   label: string;
   isPassword?: boolean;
   placeholder: string;
-  name: "email" | "password";
+  name: FieldPath<z.infer<typeof formSchema>>;
 }
 
-const CustomForm = ({
+const CustomInput = ({
   control,
   label,
   isPassword = false,
   placeholder,
   name,
-}: CustomFormProps) => {
+}: CustomInputProps) => {
   return (
     <FormField
       control={control}
@@ -44,4 +46,4 @@ const CustomForm = ({
   );
 };
 
-export default CustomForm;
+export default CustomInput;

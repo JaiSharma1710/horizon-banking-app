@@ -2,25 +2,25 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+
+import { authFormSchema } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { Loader2 } from "lucide-react";
+import CustomInput from "./CustomInput";
+import { signIn, signUp } from "@/lib/actions/user.actions";
 
-import CustomForm from "./CustomForm";
-
-export const formSchema = z.object({
-  email: z.string().email(),
-  password: z
-    .string()
-    .min(8, { message: "Password must have atleast 8 characters" }),
-});
-
-const AuthForm = ({ type }: { type: string }) => {
+const AuthForm = ({ type }: { type: "signIn" | "signUp" }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const formSchema = authFormSchema(type);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -32,11 +32,28 @@ const AuthForm = ({ type }: { type: string }) => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     setIsLoading(true);
-    console.log(values);
-    setIsLoading(false);
-  }
+
+    try {
+      if (type === "signUp") {
+        const newUser = await signUp(data);
+        // setUser(newUser);
+      } else if (type === "signIn") {
+        const response = await signIn({
+          email: data.email,
+          password: data.password,
+        });
+        // if (response) {
+        //   router.push("/");
+        // }
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="auth-form">
@@ -64,14 +81,79 @@ const AuthForm = ({ type }: { type: string }) => {
         <>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              {type === "signUp" && <></>}
-              <CustomForm
+              {type === "signUp" && (
+                <>
+                  <div className="flex gap-4">
+                    <CustomInput
+                      control={form.control}
+                      placeholder="Enter your first name"
+                      name="firstName"
+                      label="First Name"
+                    />
+
+                    <CustomInput
+                      control={form.control}
+                      placeholder="Enter your last name"
+                      name="lastName"
+                      label="Last Name"
+                    />
+                  </div>
+
+                  <CustomInput
+                    control={form.control}
+                    placeholder="Enter your address"
+                    name="address"
+                    label="Address"
+                  />
+
+                  <CustomInput
+                    control={form.control}
+                    placeholder="Enter your city"
+                    name="city"
+                    label="City"
+                  />
+
+                  <div className="flex gap-4">
+                    <CustomInput
+                      control={form.control}
+                      placeholder="Eg: NY"
+                      name="state"
+                      label="State"
+                    />
+
+                    <CustomInput
+                      control={form.control}
+                      placeholder="Eg: 110112"
+                      name="postalCode"
+                      label="Postal Code"
+                    />
+                  </div>
+
+                  <div className="flex gap-4">
+                    <CustomInput
+                      control={form.control}
+                      placeholder="YYYY-MM-DD"
+                      name="dob"
+                      label="Date Of Birth"
+                    />
+                    <CustomInput
+                      control={form.control}
+                      placeholder="Eg: 1234"
+                      name="ssn"
+                      label="SSN"
+                    />
+                  </div>
+                </>
+              )}
+
+              <CustomInput
                 control={form.control}
                 placeholder="Enter your email"
                 label="Email"
                 name="email"
               />
-              <CustomForm
+
+              <CustomInput
                 control={form.control}
                 placeholder="Enter your password"
                 label="Password"

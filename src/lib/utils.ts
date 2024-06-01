@@ -2,6 +2,7 @@
 import { type ClassValue, clsx } from "clsx";
 import qs from "query-string";
 import { twMerge } from "tailwind-merge";
+import { z } from "zod";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -192,4 +193,35 @@ export const getTransactionStatus = (date: Date) => {
   twoDaysAgo.setDate(today.getDate() - 2);
 
   return date > twoDaysAgo ? "Processing" : "Success";
+};
+
+export const authFormSchema = (type: "signIn" | "signUp") => {
+  return z.object({
+    firstName:
+      type === "signUp" ? z.string().min(3) : z.string().min(3).optional(),
+    lastName:
+      type === "signUp" ? z.string().min(3) : z.string().min(3).optional(),
+    address:
+      type === "signUp"
+        ? z.string().min(3).max(50)
+        : z.string().min(3).max(50).optional(),
+    city:
+      type === "signUp"
+        ? z.string().min(3).max(20)
+        : z.string().min(3).max(20).optional(),
+    state:
+      type === "signUp"
+        ? z.string().min(2).max(2)
+        : z.string().min(2).max(2).optional(),
+    postalCode:
+      type === "signUp"
+        ? z.string().min(3).max(6)
+        : z.string().min(3).max(6).optional(),
+    dob: type === "signUp" ? z.string().min(3) : z.string().min(3).optional(),
+    ssn: type === "signUp" ? z.string().min(3) : z.string().min(3).optional(),
+    email: z.string().email(),
+    password: z
+      .string()
+      .min(8, { message: "Password must have atleast 8 characters" }),
+  });
 };
