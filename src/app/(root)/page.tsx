@@ -6,7 +6,9 @@ import { getLoggedInUser } from "@/lib/actions/user.actions";
 const Home = async () => {
   const loggedIn = await getLoggedInUser();
 
-  console.log(loggedIn);
+  if (!loggedIn) {
+    return;
+  }
 
   return (
     <section className="home">
@@ -26,11 +28,11 @@ const Home = async () => {
         </header>
         RECENT TRANSACTION
       </div>
-      {/* <RightSidebar
+      <RightSidebar
         user={loggedIn}
         transactions={[]}
         banks={[{ currentBalance: 123.5 }, { currentBalance: 1583.47 }]}
-      /> */}
+      />
     </section>
   );
 };
